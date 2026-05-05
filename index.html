@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>ExcelVision Pro | Complete Working Dashboard</title>
+    <title>ExcelVision Pro | Ultimate Stable Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -145,9 +145,7 @@
             background: rgba(0,0,0,0.35);
             padding: 6px 18px;
             border-radius: 100px;
-            /* flex-wrap: wrap; */
         }
-        
 
         .avatar {
             width: 44px;
@@ -174,13 +172,13 @@
         .logout-btn:hover {
             background: #dc2626;
         }
-@media(max-width:600px){
-            #currentUserName{
-                font-size: small;
-            }
-            .logout-btn {
-    padding: 5px 8px;}
+
+        @media(max-width:600px){
+            #currentUserName { font-size: small; }
+            .logout-btn { padding: 5px 12px; }
+            .user-info { gap: 8px; padding: 6px 12px; }
         }
+
         .tabs-nav {
             display: flex;
             gap: 10px;
@@ -238,9 +236,6 @@
             border: 1px solid rgba(59, 130, 246, 0.3);
             padding: clamp(20px, 4vw, 36px);
             margin-bottom: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
         }
 
         .grid-2col {
@@ -305,6 +300,11 @@
             color: #0f172a;
         }
 
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
         .btn:hover {
             transform: translateY(-2px);
             filter: brightness(1.05);
@@ -326,22 +326,37 @@
             min-height: 110px;
         }
 
-        .chart-box {
+        /* FIXED STABLE CHART CONTAINER - NO SHAKING */
+        .chart-stable-container {
+            position: relative;
+            width: 100%;
             background: rgba(0, 0, 0, 0.35);
             border-radius: 28px;
-            padding: 16px;
+            padding: 20px;
             margin: 18px 0;
-            height: auto;
-            min-height: 340px;
+            overflow: hidden;
+            contain: layout paint;
+        }
+
+        .chart-stable-wrapper {
+            position: relative;
+            width: 100%;
+            min-height: 380px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         canvas {
-            max-height: 320px;
+            display: block;
             width: 100% !important;
             height: auto !important;
+            max-height: 360px;
+            min-height: 340px;
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            image-rendering: crisp-edges;
         }
 
         .data-scroll {
@@ -397,7 +412,8 @@
             gap: 12px;
             border: 1px solid rgba(59,130,246,0.2);
         }
-        .saved-item button{
+
+        .saved-item button {
             margin: 5px;
         }
 
@@ -412,7 +428,8 @@
 
         @media (max-width: 768px) {
             .grid-2col { grid-template-columns: 1fr; }
-            .chart-box { min-height: 280px; }
+            .chart-stable-wrapper { min-height: 300px; }
+            canvas { min-height: 280px; }
             .btn { padding: 8px 14px; font-size: 0.75rem; }
         }
 
@@ -448,7 +465,7 @@
         <div class="premium-header">
             <div class="logo">
                 <h1><i class="fas fa-chart-network"></i> ExcelVision Pro</h1>
-                <p>Complete Data · No Hidden Groups · Works Perfectly</p>
+                <p>Complete Data · Stable Charts · No Shaking</p>
             </div>
             <div class="user-info">
                 <div class="avatar"><i class="fas fa-user"></i></div>
@@ -469,7 +486,7 @@
                     <div class="upload-zone" id="uploadZone">
                         <i class="fas fa-file-excel fa-3x" style="color:#60a5fa;"></i>
                         <p style="margin: 12px 0 6px;">Upload Excel (.xlsx, .xls)</p>
-                        <p style="font-size:0.7rem;">Click or drag & drop - Shows ALL your data</p>
+                        <p style="font-size:0.7rem;">Click or drag & drop - Stable Charts</p>
                         <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display:none;">
                         <div class="badge-status" id="fileStatus" style="margin-top:10px;">📁 No file selected</div>
                     </div>
@@ -502,8 +519,10 @@
                 </div>
                 <div class="glass-card">
                     <h3><i class="fas fa-chart-line"></i> Live Visualization</h3>
-                    <div class="chart-box">
-                        <canvas id="mainChart"></canvas>
+                    <div class="chart-stable-container">
+                        <div class="chart-stable-wrapper">
+                            <canvas id="mainChart"></canvas>
+                        </div>
                     </div>
                     <div id="chartMeta" class="badge-status" style="display:block; text-align:center; margin-top:8px;">Select numeric columns to visualize</div>
                 </div>
@@ -520,10 +539,10 @@
             <div class="glass-card">
                 <h3><i class="fas fa-archive"></i> My Saved Workspaces</h3>
                 <div id="savedListContainer"></div>
-                <button id="clearAllSaved" class="btn" style="background:#dc2626; margin-top:18px; width:100%;"><i class="fas fa-trash-alt"></i> Delete All Workspaces</button>
+                <button id="clearAllSaved" class="btn btn-danger" style="margin-top:18px; width:100%;"><i class="fas fa-trash-alt"></i> Delete All Workspaces</button>
             </div>
         </div>
-        <footer><i class="fas fa-chart-simple"></i> Successfully displays ALL Excel data | Full transparency | No hidden groupings | Works on GitHub Pages</footer>
+        <footer><i class="fas fa-chart-simple"></i> Stable charts - No hover shaking - All Excel data displayed - Works perfectly on GitHub Pages</footer>
     </div>
 </div>
 
@@ -666,7 +685,10 @@
             borderWidth: 1.5,
             tension: 0.2,
             pointRadius: type === 'line' ? 3 : 0,
-            pointBackgroundColor: '#3b82f6'
+            pointBackgroundColor: '#3b82f6',
+            pointHoverRadius: type === 'line' ? 5 : 0,
+            hoverBackgroundColor: '#60a5fa',
+            hoverBorderWidth: 2
         };
         
         let config = { 
@@ -676,36 +698,83 @@
                 responsive: true, 
                 maintainAspectRatio: true,
                 aspectRatio: 1.6,
+                resizeDelay: 0,
+                animation: {
+                    duration: 400,
+                    easing: 'easeOutQuart'
+                },
                 plugins: { 
                     legend: { 
-                        labels: { color: '#e2e8f0', font: { size: 10 } }, 
-                        position: 'top' 
+                        labels: { color: '#e2e8f0', font: { size: 10 }, boxWidth: 12 }, 
+                        position: 'top',
+                        align: 'center'
                     }, 
                     tooltip: { 
+                        enabled: true,
+                        mode: 'nearest',
+                        intersect: false,
+                        backgroundColor: 'rgba(0,0,0,0.85)',
+                        titleColor: '#fff',
+                        bodyColor: '#cbd5e6',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1,
                         callbacks: { 
                             label: (ctx) => `${ctx.label}: ${ctx.raw} occurrences (${((ctx.raw / chartData.total) * 100).toFixed(1)}%)` 
                         } 
                     } 
-                } 
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'xy',
+                    intersect: false
+                },
+                onHover: (event, chartElement) => {
+                    if(event && event.native && event.native.target) {
+                        event.native.target.style.cursor = chartElement && chartElement.length ? 'pointer' : 'default';
+                    }
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: false,
+                    animationDuration: 0
+                }
             } 
         };
         
         if(type === 'bar') {
             config.options.scales = { 
-                y: { beginAtZero: true, grid: { color: '#2d3a5e' }, title: { display: true, text: 'Frequency', color: '#94a3b8' } },
-                x: { ticks: { autoSkip: true, maxRotation: 45, minRotation: 25, color: '#cbd5e6' } }
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: '#2d3a5e', drawBorder: true }, 
+                    title: { display: true, text: 'Frequency', color: '#94a3b8' },
+                    ticks: { color: '#cbd5e6', stepSize: 1 }
+                },
+                x: { 
+                    ticks: { autoSkip: true, maxRotation: 45, minRotation: 25, color: '#cbd5e6' },
+                    grid: { display: false }
+                }
             };
         }
         if(type === 'line') {
-            config.options.scales = { y: { beginAtZero: true, grid: { color: '#2d3a5e' } }, x: { ticks: { autoSkip: true, maxRotation: 45 } } };
+            config.options.scales = { 
+                y: { beginAtZero: true, grid: { color: '#2d3a5e' }, ticks: { color: '#cbd5e6' } }, 
+                x: { ticks: { autoSkip: true, maxRotation: 45, color: '#cbd5e6' }, grid: { display: false } } 
+            };
         }
         if(type === 'pie' || type === 'doughnut') {
             config.options.plugins.legend.position = 'right';
             config.options.plugins.legend.labels.font.size = 9;
+            config.options.cutout = type === 'doughnut' ? '50%' : 0;
+            config.options.plugins.tooltip.callbacks.label = (ctx) => {
+                const value = ctx.raw;
+                const total = chartData.total;
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${ctx.label}: ${value} occurrences (${percentage}%)`;
+            };
         }
         
         activeChart = new Chart(ctx, config);
-        document.getElementById("chartMeta").innerHTML = `✅ ALL ${chartData.groups} unique groups shown | Total: ${chartData.total} records | No data hidden`;
+        document.getElementById("chartMeta").innerHTML = `✅ ALL ${chartData.groups} unique groups shown | Total: ${chartData.total} records | No data hidden | Stable chart ready`;
     }
 
     function renderFullTable() {
@@ -733,7 +802,7 @@
             }
             html += '</tr>';
         }
-        html += '</tbody></table>';
+        html += '</tbody><table>';
         html += `<div class="badge-status" style="margin-top: 12px;">📊 Total rows: ${appData.rows.length} | Total columns: ${appData.headers.length} | Numeric columns: ${appData.numericCols.length}</div>`;
         html += '</div>';
         container.innerHTML = html;
@@ -753,7 +822,7 @@
             opt.textContent = `📊 ${col}`;
             select.appendChild(opt);
         });
-        document.getElementById("detectMsg").innerHTML = `<i class="fas fa-check-circle"></i> ✅ ${appData.numericCols.length} numeric columns auto-detected. Chart shows EVERY unique group.`;
+        document.getElementById("detectMsg").innerHTML = `<i class="fas fa-check-circle"></i> ✅ ${appData.numericCols.length} numeric columns auto-detected. Chart shows EVERY unique group with stable rendering.`;
         if(appData.numericCols.length > 0) {
             for(let i=0; i<Math.min(2, appData.numericCols.length); i++) {
                 if(select.options[i]) select.options[i].selected = true;
