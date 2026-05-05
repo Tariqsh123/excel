@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>EXCEL | Complete Data Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at 10% 20%, #0a0f1c, #060b14);
+            min-height: 100vh;
+            color: #f0f4ff;
+            overflow-x: hidden;
+        }
+
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.94);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: rgba(18, 25, 45, 0.98);
+            backdrop-filter: blur(24px);
+            border-radius: 56px;
+            padding: clamp(32px, 6vw, 56px);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+
+        .auth-container h2 {
+            font-size: clamp(1.6rem, 5vw, 2.2rem);
+            margin-bottom: 28px;
+            background: linear-gradient(135deg, #fff, #60a5fa, #3b82f6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 14px 20px;
+            margin: 12px 0;
+            border-radius: 60px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            margin: 16px 0 10px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            background: linear-gradient(105deg, #2563eb, #1d4ed8);
+            color: white;
+            transition: 0.2s;
+        }
+
+        .auth-switch {
+            margin-top: 20px;
+            color: #60a5fa;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .dashboard-wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: clamp(16px, 3vw, 32px);
+        }
+
+        .premium-header {
+            background: rgba(10, 16, 28, 0.75);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            padding: clamp(16px, 3vw, 24px) clamp(24px, 4vw, 40px);
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+        }
+
+        .logo h1 {
+            font-size: clamp(1.4rem, 5vw, 1.9rem);
+            font-weight: 800;
+            background: linear-gradient(125deg, #FFFFFF, #60a5fa, #3b82f6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .logo p {
+            font-size: 0.7rem;
+            color: #8ba0c0;
+            margin-top: 4px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: clamp(12px, 3vw, 20px);
+            background: rgba(0,0,0,0.35);
+            padding: 6px 18px;
+            border-radius: 100px;
+            flex-wrap: wrap;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: rgba(220,38,38,0.85);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 28px;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(12px);
+            padding: 6px;
+            border-radius: 80px;
+            width: fit-content;
+            max-width: 100%;
+            overflow-x: auto;
+            border: 1px solid rgba(59,130,246,0.2);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: clamp(8px, 2vw, 12px) clamp(20px, 4vw, 36px);
+            font-size: clamp(0.8rem, 3vw, 0.95rem);
+            font-weight: 600;
+            color: #94a3b8;
+            cursor: pointer;
+            border-radius: 60px;
+            transition: 0.25s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(95deg, #2563eb, #1d4ed8);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+        }
+
+        .pane {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .pane.active-pane {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            border-radius: clamp(28px, 5vw, 44px);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: clamp(20px, 4vw, 36px);
+            margin-bottom: 24px;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(59, 130, 246, 0.5);
+            border-radius: 40px;
+            padding: clamp(28px, 5vw, 38px) 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: 0.25s;
+            margin-bottom: 20px;
+        }
+
+        .upload-zone:hover {
+            border-color: #3b82f6;
+            background: rgba(37, 99, 235, 0.12);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+            flex: 1 0 auto;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(105deg, #2563eb, #1e40af);
+            color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: #0f172a;
+        }
+
+        select, .multi-select {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 36px;
+            padding: 12px 18px;
+            color: white;
+            width: 100%;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .multi-select {
+            min-height: 110px;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 28px;
+            padding: 20px;
+            margin: 18px 0;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        .data-scroll {
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 550px;
+            border-radius: 24px;
+            background: #0b1120;
+            border: 1px solid #253450;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+            min-width: 100%;
+        }
+
+        th {
+            background: #0f172f;
+            padding: 14px 10px;
+            color: #cbd5ff;
+            position: sticky;
+            top: 0;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-top: 1px solid #1e2a44;
+            color: #cbd5f0;
+            text-align: left;
+        }
+
+        .badge-status {
+            background: #1e2a3a;
+            border-radius: 40px;
+            padding: 6px 14px;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
+
+        .saved-item {
+            background: rgba(37, 99, 235, 0.12);
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1px solid rgba(59,130,246,0.2);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #6b7c9e;
+            font-size: 0.7rem;
+            border-top: 1px solid rgba(59,130,246,0.15);
+        }
+
+        @media (max-width: 768px) {
+            .grid-2col { grid-template-columns: 1fr; }
+            .chart-wrapper { min-height: 320px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="authModal" class="auth-overlay">
+    <div class="auth-container">
+        <h2><i class="fas fa-chart-line"></i> EXCEL</h2>
+        <div id="loginPanel">
+            <input type="text" id="loginUsername" placeholder="Username" class="auth-input">
+            <input type="password" id="loginPassword" placeholder="Password" class="auth-input">
+            <button id="doLogin" class="auth-btn"><i class="fas fa-sign-in-alt"></i> Login</button>
+            <div class="auth-switch" id="showRegister">Create new account →</div>
+        </div>
+        <div id="registerPanel" class="hidden">
+            <input type="text" id="regUsername" placeholder="Username" class="auth-input">
+            <input type="password" id="regPassword" placeholder="Password" class="auth-input">
+            <button id="doRegister" class="auth-btn"><i class="fas fa-user-plus"></i> Register</button>
+            <div class="auth-switch" id="showLogin">← Back to Login</div>
+        </div>
+    </div>
+</div>
+
+<div id="mainApp" class="hidden">
+    <div class="dashboard-wrapper">
+        <div class="premium-header">
+            <div class="logo">
+                <h1><i class="fas fa-chart-network"></i> EXCEL</h1>
+                <p>Complete Data · No Hidden Groups · Full Transparency</p>
+            </div>
+            <div class="user-info">
+                <div class="avatar"><i class="fas fa-user"></i></div>
+                <span id="currentUserName"></span>
+                <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</button>
+            <button class="tab-btn" data-tab="saved"><i class="fas fa-database"></i> Saved Workspaces</button>
+        </div>
+
+        <div id="dashboardTab" class="pane active-pane">
+            <div class="grid-2col">
+                <div class="glass-card">
+                    <h3 style="margin-bottom: 18px;"><i class="fas fa-cloud-upload-alt"></i> Data Import</h3>
+                    <div class="upload-zone" id="uploadZone">
+                        <i class="fas fa-file-excel fa-3x" style="color:#60a5fa;"></i>
+                        <p style="margin: 12px 0 6px;">Upload Excel (.xlsx, .xls)</p>
+                        <p style="font-size:0.7rem;">Click or drag & drop - Preserves all data</p>
+                        <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none;">
+                        <div class="badge-status" id="fileStatus" style="margin-top:10px;">📁 No file</div>
+                    </div>
+                    <div class="btn-group">
+                        <button id="sampleDataBtn" class="btn"><i class="fas fa-chart-line"></i> Sample Dataset</button>
+                        <button id="resetAllBtn" class="btn"><i class="fas fa-brush"></i> Reset</button>
+                    </div>
+                    <div id="detectMsg" style="background:rgba(59,130,246,0.12); border-radius:28px; padding:12px; margin:14px 0; font-size:0.75rem;">
+                        <i class="fas fa-robot"></i> Auto-detecting numeric columns...
+                    </div>
+                    <div>
+                        <label><i class="fas fa-chart-simple"></i> Select Numeric Columns (Ctrl+Click)</label>
+                        <select multiple id="numericSelect" class="multi-select"></select>
+                        <div class="badge-status" style="margin-top:6px;">💡 Hold Ctrl/Cmd for multiple selection</div>
+                    </div>
+                    <div style="margin-top:14px;">
+                        <label><i class="fas fa-chart-pie"></i> Chart Type</label>
+                        <select id="chartTypeSelect">
+                            <option value="bar">📊 Bar Chart (Best for comparison)</option>
+                            <option value="pie">🥧 Pie Chart (Proportions)</option>
+                            <option value="doughnut">🍩 Doughnut Chart</option>
+                            <option value="line">📈 Line Chart (Trends)</option>
+                        </select>
+                    </div>
+                    <div class="btn-group">
+                        <button id="generateChartBtn" class="btn btn-primary"><i class="fas fa-play"></i> Generate Chart</button>
+                        <button id="downloadChartBtn" class="btn btn-success"><i class="fas fa-camera"></i> Export PNG</button>
+                        <button id="saveWorkspaceBtn" class="btn btn-warning"><i class="fas fa-save"></i> Save View</button>
+                    </div>
+                </div>
+                <div class="glass-card">
+                    <h3><i class="fas fa-chart-line"></i> Live Visualization</h3>
+                    <div class="chart-container">
+                        <div class="chart-wrapper">
+                            <canvas id="mainChart"></canvas>
+                        </div>
+                    </div>
+                    <div id="chartMeta" class="badge-status" style="display:block; text-align:center; margin-top:8px;">Select numeric columns to visualize - ALL data shown, no grouping</div>
+                </div>
+            </div>
+            <div class="glass-card">
+                <h3><i class="fas fa-table"></i> Complete Data Preview (All Rows - Exact Excel Import)</h3>
+                <div class="data-scroll" id="previewArea">
+                    <div style="padding:60px; text-align:center;">Upload Excel to see full dataset with all columns preserved</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="savedTab" class="pane">
+            <div class="glass-card">
+                <h3><i class="fas fa-archive"></i> My Saved Workspaces</h3>
+                <div id="savedListContainer"></div>
+                <button id="clearAllSaved" class="btn" style="background:#dc2626; margin-top:18px; width:100%;"><i class="fas fa-trash-alt"></i> Delete All Workspaces</button>
+            </div>
+        </div>
+        <footer><i class="fas fa-chart-simple"></i> Full data transparency — charts show EVERY data point individually | No "Others" grouping | Complete Excel parsing</footer>
+    </div>
+</div>
+
+<script>
+    let users = JSON.parse(localStorage.getItem("excel_users")) || [];
+    let currentUser = localStorage.getItem("excel_current_user") || null;
+    function saveUsers() { localStorage.setItem("excel_users", JSON.stringify(users)); }
+
+    if(currentUser) {
+        document.getElementById("authModal").classList.add("hidden");
+        document.getElementById("mainApp").classList.remove("hidden");
+        document.getElementById("currentUserName").innerText = currentUser;
+    }
+
+    document.getElementById("showRegister").addEventListener("click", () => {
+        document.getElementById("loginPanel").classList.add("hidden");
+        document.getElementById("registerPanel").classList.remove("hidden");
+    });
+    document.getElementById("showLogin").addEventListener("click", () => {
+        document.getElementById("registerPanel").classList.add("hidden");
+        document.getElementById("loginPanel").classList.remove("hidden");
+    });
+    document.getElementById("doRegister").addEventListener("click", () => {
+        let u = document.getElementById("regUsername").value.trim();
+        let p = document.getElementById("regPassword").value.trim();
+        if(!u || !p) { alert("Enter username and password"); return; }
+        if(users.find(user => user.username === u)) { alert("Username already exists"); return; }
+        users.push({ username: u, password: p });
+        saveUsers();
+        alert("Registration successful! Please login.");
+        document.getElementById("registerPanel").classList.add("hidden");
+        document.getElementById("loginPanel").classList.remove("hidden");
+        document.getElementById("regUsername").value = "";
+        document.getElementById("regPassword").value = "";
+    });
+    document.getElementById("doLogin").addEventListener("click", () => {
+        let u = document.getElementById("loginUsername").value.trim();
+        let p = document.getElementById("loginPassword").value.trim();
+        let user = users.find(user => user.username === u && user.password === p);
+        if(user) {
+            localStorage.setItem("excel_current_user", u);
+            currentUser = u;
+            location.reload();
+        } else { alert("Invalid credentials"); }
+    });
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("excel_current_user");
+        location.reload();
+    });
+
+    let appData = { rows: [], headers: [], numericCols: [] };
+    let activeChart = null;
+    let currentSelectedCols = [];
+    let savedWorkspaces = JSON.parse(localStorage.getItem("excel_workspaces_main")) || [];
+    function saveWorkspacesToLocal() { localStorage.setItem("excel_workspaces_main", JSON.stringify(savedWorkspaces)); }
+
+    function detectNumericColumns(rows, headers) {
+        let numeric = [];
+        for(let col of headers) {
+            let numCount = 0, validCount = 0;
+            for(let i=0; i<Math.min(rows.length, 300); i++) {
+                let val = rows[i][col];
+                if(val !== undefined && val !== null && val !== "") {
+                    validCount++;
+                    if(typeof val === 'number') numCount++;
+                    else if(!isNaN(parseFloat(val)) && isFinite(val)) numCount++;
+                }
+            }
+            if(validCount > 0 && (numCount / validCount) >= 0.6) numeric.push(col);
+        }
+        return numeric;
+    }
+
+    function buildCompleteFrequency(selectedCols) {
+        if(!appData.rows.length || !selectedCols.length) return null;
+        let freqMap = new Map();
+        for(let row of appData.rows) {
+            let keys = [];
+            let valid = true;
+            for(let col of selectedCols) {
+                let val = row[col];
+                if(val === undefined || val === null || val === "") { valid = false; break; }
+                let num = parseFloat(val);
+                if(isNaN(num)) { valid = false; break; }
+                keys.push(num.toFixed(4));
+            }
+            if(valid) {
+                let composite = keys.join(" | ");
+                freqMap.set(composite, (freqMap.get(composite) || 0) + 1);
+            }
+        }
+        if(freqMap.size === 0) return null;
+        
+        let entries = Array.from(freqMap.entries()).map(([label, count]) => ({ 
+            label: label.length > 55 ? label.slice(0,52)+"…" : label, 
+            count: count 
+        }));
+        entries.sort((a,b) => b.count - a.count);
+        
+        return { 
+            labels: entries.map(e => e.label), 
+            values: entries.map(e => e.count), 
+            total: entries.reduce((s,e)=>s+e.count,0), 
+            groups: entries.length 
+        };
+    }
+
+    function renderChart() {
+        let selected = Array.from(document.getElementById("numericSelect").selectedOptions).map(opt => opt.value);
+        if(selected.length === 0 && appData.numericCols.length) selected = [appData.numericCols[0]];
+        if(!selected.length || !appData.rows.length) {
+            if(activeChart) { activeChart.destroy(); activeChart = null; }
+            document.getElementById("chartMeta").innerHTML = "⚠️ Upload Excel & select numeric columns";
+            return;
+        }
+        currentSelectedCols = selected;
+        let chartData = buildCompleteFrequency(selected);
+        if(!chartData || chartData.labels.length === 0) {
+            document.getElementById("chartMeta").innerHTML = "❌ No valid numeric data for selected columns";
+            return;
+        }
+        
+        let type = document.getElementById("chartTypeSelect").value;
+        let ctx = document.getElementById("mainChart").getContext("2d");
+        if(activeChart) { activeChart.destroy(); activeChart = null; }
+        
+        let vibrantColors = [
+            '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec489a', '#06b6d4', 
+            '#84cc16', '#f97316', '#a855f7', '#14b8a6', '#d946ef', '#eab308', '#f43f5e', 
+            '#0ea5e9', '#6366f1', '#d97706', '#059669', '#7c3aed', '#db2777', '#0891b2'
+        ];
+        
+        let backgroundColor = (type === 'bar' || type === 'line') ? '#3b82f6' : vibrantColors.slice(0, chartData.labels.length);
+        
+        let dataset = {
+            label: `Distribution (${selected.join(" + ")})`,
+            data: chartData.values,
+            backgroundColor: backgroundColor,
+            borderColor: '#ffffff',
+            borderWidth: 1.5,
+            tension: 0.2,
+            pointRadius: type === 'line' ? 3 : 0,
+            pointBackgroundColor: '#3b82f6'
+        };
+        
+        let config = { 
+            type: type, 
+            data: { labels: chartData.labels, datasets: [dataset] }, 
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: true,
+                aspectRatio: 1.8,
+                plugins: { 
+                    legend: { 
+                        labels: { color: '#e2e8f0', font: { size: 10 } }, 
+                        position: 'top' 
+                    }, 
+                    tooltip: { 
+                        callbacks: { 
+                            label: (ctx) => `${ctx.label}: ${ctx.raw} occurrences (${((ctx.raw / chartData.total) * 100).toFixed(1)}%)` 
+                        } 
+                    } 
+                },
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 25,
+                        top: 10,
+                        bottom: 20
+                    }
+                }
+            } 
+        };
+        
+        if(type === 'bar') {
+            config.options.scales = { 
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: '#2d3a5e' }, 
+                    title: { display: true, text: 'Frequency', color: '#94a3b8' } 
+                },
+                x: {
+                    ticks: { 
+                        autoSkip: true,
+                        maxRotation: 45,
+                        minRotation: 25,
+                        color: '#cbd5e6'
+                    }
+                }
+            };
+        }
+        if(type === 'line') {
+            config.options.scales = { 
+                y: { beginAtZero: true, grid: { color: '#2d3a5e' } }, 
+                x: { ticks: { autoSkip: true, maxRotation: 45, color: '#cbd5e6' } } 
+            };
+        }
+        if(type === 'pie' || type === 'doughnut') {
+            config.options.plugins.legend.position = 'right';
+            config.options.plugins.legend.labels.font.size = 9;
+        }
+        
+        activeChart = new Chart(ctx, config);
+        document.getElementById("chartMeta").innerHTML = `✅ ALL ${chartData.groups} unique groups shown | Total records: ${chartData.total} | Columns: ${selected.join(", ")} | No data hidden`;
+    }
+
+    function renderFullTable() {
+        let container = document.getElementById("previewArea");
+        if(!appData.rows || !appData.rows.length) { 
+            container.innerHTML = '<div style="padding:60px;text-align:center;">📁 Upload Excel file to see complete data preview with all columns</div>'; 
+            return; 
+        }
+        
+        let html = '<div style="overflow-x: auto;">';
+        html += '<table style="min-width: 100%;">';
+        html += '<thead></tr>';
+        for(let h of appData.headers) {
+            html += `<th style="white-space: nowrap; background: #1a2740;">${escapeHtml(String(h))}</th>`;
+        }
+        html += '</thead><tbody>';
+        
+        for(let i = 0; i < appData.rows.length; i++) {
+            html += '<tr>';
+            for(let h of appData.headers) {
+                let val = appData.rows[i][h];
+                let display = (val === undefined || val === null || val === "") ? "—" : String(val);
+                if(display.length > 80) display = display.substring(0, 77) + "...";
+                html += `<td style="max-width: 280px; word-break: break-word; white-space: normal;">${escapeHtml(display)}</td>`;
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        html += `<div class="badge-status" style="margin-top: 12px;">📊 Total rows: ${appData.rows.length} | Total columns: ${appData.headers.length} | Numeric columns: ${appData.numericCols.length}</div>`;
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function updateNumericSelector() {
+        let select = document.getElementById("numericSelect");
+        select.innerHTML = '';
+        if(!appData.numericCols.length) {
+            select.innerHTML = '<option disabled>⚠️ No numeric columns detected</option>';
+            document.getElementById("detectMsg").innerHTML = '<i class="fas fa-exclamation-triangle"></i> No numeric columns found. Try sample dataset or ensure your Excel has numeric values.';
+            return;
+        }
+        appData.numericCols.forEach(col => {
+            let opt = document.createElement('option');
+            opt.value = col;
+            opt.textContent = `📊 ${col}`;
+            select.appendChild(opt);
+        });
+        document.getElementById("detectMsg").innerHTML = `<i class="fas fa-check-circle"></i> ✅ ${appData.numericCols.length} numeric columns auto-detected. Chart shows EVERY unique group.`;
+        for(let i=0; i<Math.min(2, appData.numericCols.length); i++) if(select.options[i]) select.options[i].selected = true;
+        renderChart();
+        renderFullTable();
+    }
+
+    function loadExcelData(arrayBuffer) {
+        try {
+            let workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: false, defval: "" });
+            let firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            let rawData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "", blankrows: false });
+            
+            if(!rawData || rawData.length < 2) throw new Error("File has insufficient data");
+            
+            let headers = [];
+            let startRow = 0;
+            
+            for(let i = 0; i < Math.min(5, rawData.length); i++) {
+                let row = rawData[i];
+                if(row && row.some(cell => cell && String(cell).trim() !== "")) {
+                    let tempHeaders = row.map((cell, idx) => {
+                        if(cell && String(cell).trim() !== "") return String(cell).trim();
+                        else return `Column_${idx + 1}`;
+                    });
+                    if(tempHeaders.some(h => !h.startsWith("Column_"))) {
+                        headers = tempHeaders;
+                        startRow = i + 1;
+                        break;
+                    }
+                }
+            }
+            
+            if(headers.length === 0) {
+                headers = rawData[0].map((_, idx) => `Column_${idx + 1}`);
+                startRow = 1;
+            }
+            
+            let dataRows = [];
+            for(let i = startRow; i < rawData.length; i++) {
+                let row = rawData[i];
+                if(!row || row.every(cell => cell === undefined || cell === null || cell === "")) continue;
+                let obj = {};
+                for(let j = 0; j < headers.length; j++) {
+                    let val = (j < row.length) ? row[j] : "";
+                    obj[headers[j]] = (val === undefined || val === null) ? "" : val;
+                }
+                dataRows.push(obj);
+            }
+            
+            if(dataRows.length === 0) throw new Error("No data rows found");
+            
+            let cleanedHeaders = headers.map(h => String(h).replace(/[^\w\s\u0600-\u06FF\u00C0-\u024F]/g, '').trim() || `col_${Math.random()}`);
+            
+            appData = { 
+                rows: dataRows, 
+                headers: cleanedHeaders, 
+                numericCols: detectNumericColumns(dataRows, cleanedHeaders)
+            };
+            
+            updateNumericSelector();
+            document.getElementById("fileStatus").innerHTML = `✅ ${dataRows.length} rows | ${appData.numericCols.length} numeric columns | ${cleanedHeaders.length} total columns`;
+        } catch(e) { 
+            alert("Error parsing file: " + e.message); 
+            document.getElementById("fileStatus").innerHTML = "❌ Failed to load"; 
+        }
+    }
+
+    function loadSample() {
+        appData = {
+            rows: [
+                { "Country": "United States", "Year": 2023, "Rank": 1, "GDP_Trillion": 25.44, "Population_M": 335, "Growth_Pct": 2.1, "Inflation": 3.4 },
+                { "Country": "China", "Year": 2023, "Rank": 2, "GDP_Trillion": 17.96, "Population_M": 1412, "Growth_Pct": 5.2, "Inflation": 0.7 },
+                { "Country": "Japan", "Year": 2023, "Rank": 3, "GDP_Trillion": 4.23, "Population_M": 125, "Growth_Pct": 1.0, "Inflation": 2.8 },
+                { "Country": "Germany", "Year": 2023, "Rank": 4, "GDP_Trillion": 4.08, "Population_M": 83, "Growth_Pct": 1.8, "Inflation": 3.1 },
+                { "Country": "India", "Year": 2023, "Rank": 5, "GDP_Trillion": 3.73, "Population_M": 1428, "Growth_Pct": 6.3, "Inflation": 5.5 },
+                { "Country": "United Kingdom", "Year": 2023, "Rank": 6, "GDP_Trillion": 3.09, "Population_M": 67, "Growth_Pct": 0.5, "Inflation": 4.2 },
+                { "Country": "France", "Year": 2023, "Rank": 7, "GDP_Trillion": 2.78, "Population_M": 68, "Growth_Pct": 0.7, "Inflation": 3.0 },
+                { "Country": "Italy", "Year": 2023, "Rank": 8, "GDP_Trillion": 2.01, "Population_M": 59, "Growth_Pct": 0.9, "Inflation": 2.5 },
+                { "Country": "Canada", "Year": 2023, "Rank": 9, "GDP_Trillion": 1.98, "Population_M": 38, "Growth_Pct": 1.4, "Inflation": 3.9 },
+                { "Country": "Brazil", "Year": 2023, "Rank": 10, "GDP_Trillion": 1.92, "Population_M": 214, "Growth_Pct": 2.9, "Inflation": 4.6 },
+                { "Country": "Australia", "Year": 2023, "Rank": 11, "GDP_Trillion": 1.69, "Population_M": 26, "Growth_Pct": 2.0, "Inflation": 4.1 },
+                { "Country": "South Korea", "Year": 2023, "Rank": 12, "GDP_Trillion": 1.67, "Population_M": 52, "Growth_Pct": 1.4, "Inflation": 2.7 },
+                { "Country": "Mexico", "Year": 2023, "Rank": 13, "GDP_Trillion": 1.41, "Population_M": 129, "Growth_Pct": 3.2, "Inflation": 5.0 },
+                { "Country": "Spain", "Year": 2023, "Rank": 14, "GDP_Trillion": 1.39, "Population_M": 48, "Growth_Pct": 1.1, "Inflation": 3.2 },
+                { "Country": "Indonesia", "Year": 2023, "Rank": 15, "GDP_Trillion": 1.32, "Population_M": 277, "Growth_Pct": 5.0, "Inflation": 3.8 }
+            ],
+            headers: ["Country", "Year", "Rank", "GDP_Trillion", "Population_M", "Growth_Pct", "Inflation"],
+            numericCols: ["Year", "Rank", "GDP_Trillion", "Population_M", "Growth_Pct", "Inflation"]
+        };
+        updateNumericSelector();
+        document.getElementById("fileStatus").innerHTML = "📊 Sample Dataset Loaded (15 countries, 6 numeric metrics) - ALL data shown in charts";
+    }
+
+    function resetAll() {
+        appData = { rows: [], headers: [], numericCols: [] };
+        if(activeChart) { activeChart.destroy(); activeChart = null; }
+        document.getElementById("numericSelect").innerHTML = '<option disabled>No data</option>';
+        document.getElementById("previewArea").innerHTML = '<div style="padding:60px;text-align:center;">Upload Excel to see complete data preview</div>';
+        document.getElementById("chartMeta").innerHTML = "No active chart";
+        document.getElementById("fileStatus").innerHTML = "📁 No file";
+        document.getElementById("detectMsg").innerHTML = '<i class="fas fa-robot"></i> Auto-detecting numeric columns...';
+        let ctx = document.getElementById("mainChart").getContext("2d");
+        ctx.clearRect(0, 0, 800, 400);
+    }
+
+    function saveWorkspace() {
+        if(!appData.rows.length || !currentSelectedCols.length) { alert("No data or columns selected to save"); return; }
+        let name = prompt("Workspace name:", `${currentUser}_${new Date().toLocaleString()}`);
+        if(!name) return;
+        let workspace = { id: Date.now(), name, user: currentUser, date: new Date().toISOString(), columns: currentSelectedCols, chartType: document.getElementById("chartTypeSelect").value, headers: appData.headers, numericFields: appData.numericCols, dataSnapshot: appData.rows.slice(0, 200) };
+        savedWorkspaces.unshift(workspace);
+        if(savedWorkspaces.length > 15) savedWorkspaces.pop();
+        saveWorkspacesToLocal();
+        renderSavedList();
+        alert("Workspace saved successfully!");
+    }
+
+    function renderSavedList() {
+        let container = document.getElementById("savedListContainer");
+        if(!savedWorkspaces.length) { container.innerHTML = '<div style="padding:40px;text-align:center;">No saved workspaces. Create one in Dashboard.</div>'; return; }
+        let html = '';
+        savedWorkspaces.forEach(ws => {
+            html += `<div class="saved-item"><div><strong><i class="fas fa-cube"></i> ${escapeHtml(ws.name)}</strong><br><small>${escapeHtml(ws.user)} | ${new Date(ws.date).toLocaleString()} | Columns: ${ws.columns?.join(", ") || "N/A"}</small></div><div><button class="btn btn-primary loadWs" data-id="${ws.id}" style="padding:6px 14px;">Load</button> <button class="btn delWs" data-id="${ws.id}" style="background:#dc2626; padding:6px 14px;">Delete</button></div></div>`;
+        });
+        container.innerHTML = html;
+        document.querySelectorAll(".loadWs").forEach(btn => btn.addEventListener("click", (e) => { let id = parseInt(btn.dataset.id); let ws = savedWorkspaces.find(w=>w.id===id); if(ws && ws.dataSnapshot) { appData = { rows: ws.dataSnapshot, headers: ws.headers, numericCols: ws.numericFields || detectNumericColumns(ws.dataSnapshot, ws.headers) }; updateNumericSelector(); if(ws.columns) { let sel = document.getElementById("numericSelect"); Array.from(sel.options).forEach(opt => { if(ws.columns.includes(opt.value)) opt.selected = true; }); } if(ws.chartType) document.getElementById("chartTypeSelect").value = ws.chartType; renderChart(); document.querySelector('.tab-btn[data-tab="dashboard"]').click(); } }));
+        document.querySelectorAll(".delWs").forEach(btn => btn.addEventListener("click", (e) => { let id = parseInt(btn.dataset.id); savedWorkspaces = savedWorkspaces.filter(w=>w.id !== id); saveWorkspacesToLocal(); renderSavedList(); }));
+    }
+
+    function downloadChart() { 
+        if(activeChart) { 
+            let canvas = document.getElementById("mainChart");
+            let link = document.createElement('a'); 
+            link.download = `excel_chart_${Date.now()}.png`; 
+            link.href = canvas.toDataURL(); 
+            link.click(); 
+        } else { alert("Generate a chart first"); } 
+    }
+
+    function escapeHtml(str) { 
+        if(!str) return ''; 
+        return String(str).replace(/[&<>]/g, m=> m==='&'?'&amp;': m==='<'?'&lt;':'&gt;'); 
+    }
+
+    document.getElementById("uploadZone").addEventListener("click", () => document.getElementById("excelFile").click());
+    document.getElementById("excelFile").addEventListener("change", (e) => { if(e.target.files[0]) { let reader = new FileReader(); reader.onload = (ev) => loadExcelData(ev.target.result); reader.readAsArrayBuffer(e.target.files[0]); } });
+    document.getElementById("generateChartBtn").addEventListener("click", () => renderChart());
+    document.getElementById("sampleDataBtn").addEventListener("click", () => loadSample());
+    document.getElementById("resetAllBtn").addEventListener("click", () => resetAll());
+    document.getElementById("downloadChartBtn").addEventListener("click", downloadChart);
+    document.getElementById("saveWorkspaceBtn").addEventListener("click", saveWorkspace);
+    document.getElementById("clearAllSaved").addEventListener("click", () => { if(confirm("Delete all saved workspaces permanently?")) { savedWorkspaces = []; saveWorkspacesToLocal(); renderSavedList(); } });
+    
+    document.querySelectorAll(".tab-btn").forEach(btn => { btn.addEventListener("click", () => { document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); document.querySelectorAll(".pane").forEach(p=>p.classList.remove("active-pane")); document.getElementById(btn.dataset.tab + "Tab").classList.add("active-pane"); if(btn.dataset.tab === "saved") renderSavedList(); }); });
+    
+    const uploadZone = document.getElementById("uploadZone");
+    uploadZone.addEventListener("dragover", (e) => { e.preventDefault(); uploadZone.style.borderColor = "#3b82f6"; uploadZone.style.background = "rgba(37,99,235,0.15)"; });
+    uploadZone.addEventListener("dragleave", () => { uploadZone.style.borderColor = "rgba(59,130,246,0.5)"; uploadZone.style.background = "rgba(0,0,0,0.3)"; });
+    uploadZone.addEventListener("drop", (e) => { e.preventDefault(); uploadZone.style.borderColor = "rgba(59,130,246,0.5)"; let file = e.dataTransfer.files[0]; if(file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) { document.getElementById("excelFile").files = e.dataTransfer.files; let event = new Event('change'); document.getElementById("excelFile").dispatchEvent(event); } else { alert("Please drop an Excel file (.xlsx or .xls)"); } });
+    
+    resetAll();
+</script>
+</body>
+</html>
