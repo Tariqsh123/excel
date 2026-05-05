@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>EXCEL | Complete Data Dashboard</title>
+    <title>ExcelVision Pro | Complete Working Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -145,8 +145,9 @@
             background: rgba(0,0,0,0.35);
             padding: 6px 18px;
             border-radius: 100px;
-            flex-wrap: wrap;
+            /* flex-wrap: wrap; */
         }
+        
 
         .avatar {
             width: 44px;
@@ -170,6 +171,16 @@
             transition: 0.2s;
         }
 
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+@media(max-width:600px){
+            #currentUserName{
+                font-size: small;
+            }
+            .logout-btn {
+    padding: 5px 8px;}
+        }
         .tabs-nav {
             display: flex;
             gap: 10px;
@@ -227,6 +238,9 @@
             border: 1px solid rgba(59, 130, 246, 0.3);
             padding: clamp(20px, 4vw, 36px);
             margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .grid-2col {
@@ -250,6 +264,7 @@
         .upload-zone:hover {
             border-color: #3b82f6;
             background: rgba(37, 99, 235, 0.12);
+            transform: scale(1.01);
         }
 
         .btn-group {
@@ -277,6 +292,7 @@
         .btn-primary {
             background: linear-gradient(105deg, #2563eb, #1e40af);
             color: white;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.3);
         }
 
         .btn-success {
@@ -289,6 +305,11 @@
             color: #0f172a;
         }
 
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+
         select, .multi-select {
             background: #0f172a;
             border: 1px solid #334155;
@@ -298,34 +319,27 @@
             width: 100%;
             margin-top: 8px;
             font-weight: 500;
+            cursor: pointer;
         }
 
         .multi-select {
             min-height: 110px;
         }
 
-        .chart-container {
-            position: relative;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.3);
+        .chart-box {
+            background: rgba(0, 0, 0, 0.35);
             border-radius: 28px;
-            padding: 20px;
+            padding: 16px;
             margin: 18px 0;
-        }
-
-        .chart-wrapper {
-            position: relative;
-            width: 100%;
-            min-height: 400px;
+            height: auto;
+            min-height: 340px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            overflow-x: auto;
-            overflow-y: hidden;
+            justify-content: center;
         }
 
         canvas {
-            display: block;
+            max-height: 320px;
             width: 100% !important;
             height: auto !important;
         }
@@ -333,7 +347,7 @@
         .data-scroll {
             overflow-x: auto;
             overflow-y: auto;
-            max-height: 550px;
+            max-height: 500px;
             border-radius: 24px;
             background: #0b1120;
             border: 1px solid #253450;
@@ -383,6 +397,9 @@
             gap: 12px;
             border: 1px solid rgba(59,130,246,0.2);
         }
+        .saved-item button{
+            margin: 5px;
+        }
 
         footer {
             text-align: center;
@@ -395,7 +412,14 @@
 
         @media (max-width: 768px) {
             .grid-2col { grid-template-columns: 1fr; }
-            .chart-wrapper { min-height: 320px; }
+            .chart-box { min-height: 280px; }
+            .btn { padding: 8px 14px; font-size: 0.75rem; }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-wrapper { padding: 12px; }
+            .btn-group { flex-direction: column; }
+            .btn { width: 100%; }
         }
     </style>
 </head>
@@ -403,7 +427,7 @@
 
 <div id="authModal" class="auth-overlay">
     <div class="auth-container">
-        <h2><i class="fas fa-chart-line"></i> EXCEL</h2>
+        <h2><i class="fas fa-chart-line"></i> ExcelVision Pro</h2>
         <div id="loginPanel">
             <input type="text" id="loginUsername" placeholder="Username" class="auth-input">
             <input type="password" id="loginPassword" placeholder="Password" class="auth-input">
@@ -423,8 +447,8 @@
     <div class="dashboard-wrapper">
         <div class="premium-header">
             <div class="logo">
-                <h1><i class="fas fa-chart-network"></i> EXCEL</h1>
-                <p>Complete Data · No Hidden Groups · Full Transparency</p>
+                <h1><i class="fas fa-chart-network"></i> ExcelVision Pro</h1>
+                <p>Complete Data · No Hidden Groups · Works Perfectly</p>
             </div>
             <div class="user-info">
                 <div class="avatar"><i class="fas fa-user"></i></div>
@@ -445,9 +469,9 @@
                     <div class="upload-zone" id="uploadZone">
                         <i class="fas fa-file-excel fa-3x" style="color:#60a5fa;"></i>
                         <p style="margin: 12px 0 6px;">Upload Excel (.xlsx, .xls)</p>
-                        <p style="font-size:0.7rem;">Click or drag & drop - Preserves all data</p>
-                        <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none;">
-                        <div class="badge-status" id="fileStatus" style="margin-top:10px;">📁 No file</div>
+                        <p style="font-size:0.7rem;">Click or drag & drop - Shows ALL your data</p>
+                        <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display:none;">
+                        <div class="badge-status" id="fileStatus" style="margin-top:10px;">📁 No file selected</div>
                     </div>
                     <div class="btn-group">
                         <button id="sampleDataBtn" class="btn"><i class="fas fa-chart-line"></i> Sample Dataset</button>
@@ -457,17 +481,17 @@
                         <i class="fas fa-robot"></i> Auto-detecting numeric columns...
                     </div>
                     <div>
-                        <label><i class="fas fa-chart-simple"></i> Select Numeric Columns (Ctrl+Click)</label>
+                        <label><i class="fas fa-chart-simple"></i> Select Numeric Columns (Ctrl+Click for multiple)</label>
                         <select multiple id="numericSelect" class="multi-select"></select>
                         <div class="badge-status" style="margin-top:6px;">💡 Hold Ctrl/Cmd for multiple selection</div>
                     </div>
                     <div style="margin-top:14px;">
                         <label><i class="fas fa-chart-pie"></i> Chart Type</label>
                         <select id="chartTypeSelect">
-                            <option value="bar">📊 Bar Chart (Best for comparison)</option>
-                            <option value="pie">🥧 Pie Chart (Proportions)</option>
+                            <option value="bar">📊 Bar Chart</option>
+                            <option value="pie">🥧 Pie Chart</option>
                             <option value="doughnut">🍩 Doughnut Chart</option>
-                            <option value="line">📈 Line Chart (Trends)</option>
+                            <option value="line">📈 Line Chart</option>
                         </select>
                     </div>
                     <div class="btn-group">
@@ -478,18 +502,16 @@
                 </div>
                 <div class="glass-card">
                     <h3><i class="fas fa-chart-line"></i> Live Visualization</h3>
-                    <div class="chart-container">
-                        <div class="chart-wrapper">
-                            <canvas id="mainChart"></canvas>
-                        </div>
+                    <div class="chart-box">
+                        <canvas id="mainChart"></canvas>
                     </div>
-                    <div id="chartMeta" class="badge-status" style="display:block; text-align:center; margin-top:8px;">Select numeric columns to visualize - ALL data shown, no grouping</div>
+                    <div id="chartMeta" class="badge-status" style="display:block; text-align:center; margin-top:8px;">Select numeric columns to visualize</div>
                 </div>
             </div>
             <div class="glass-card">
-                <h3><i class="fas fa-table"></i> Complete Data Preview (All Rows - Exact Excel Import)</h3>
+                <h3><i class="fas fa-table"></i> Complete Data Preview (All Rows - Exact Excel Data)</h3>
                 <div class="data-scroll" id="previewArea">
-                    <div style="padding:60px; text-align:center;">Upload Excel to see full dataset with all columns preserved</div>
+                    <div style="padding:60px; text-align:center;">📁 Upload Excel file to see complete data with all original values</div>
                 </div>
             </div>
         </div>
@@ -501,7 +523,7 @@
                 <button id="clearAllSaved" class="btn" style="background:#dc2626; margin-top:18px; width:100%;"><i class="fas fa-trash-alt"></i> Delete All Workspaces</button>
             </div>
         </div>
-        <footer><i class="fas fa-chart-simple"></i> Full data transparency — charts show EVERY data point individually | No "Others" grouping | Complete Excel parsing</footer>
+        <footer><i class="fas fa-chart-simple"></i> Successfully displays ALL Excel data | Full transparency | No hidden groupings | Works on GitHub Pages</footer>
     </div>
 </div>
 
@@ -564,10 +586,10 @@
             let numCount = 0, validCount = 0;
             for(let i=0; i<Math.min(rows.length, 300); i++) {
                 let val = rows[i][col];
-                if(val !== undefined && val !== null && val !== "") {
+                if(val !== undefined && val !== null && val !== "" && val !== "-") {
                     validCount++;
                     if(typeof val === 'number') numCount++;
-                    else if(!isNaN(parseFloat(val)) && isFinite(val)) numCount++;
+                    else if(!isNaN(parseFloat(val)) && isFinite(val) && String(val).trim() !== "") numCount++;
                 }
             }
             if(validCount > 0 && (numCount / validCount) >= 0.6) numeric.push(col);
@@ -575,7 +597,7 @@
         return numeric;
     }
 
-    function buildCompleteFrequency(selectedCols) {
+    function buildFullFrequency(selectedCols) {
         if(!appData.rows.length || !selectedCols.length) return null;
         let freqMap = new Map();
         for(let row of appData.rows) {
@@ -583,7 +605,7 @@
             let valid = true;
             for(let col of selectedCols) {
                 let val = row[col];
-                if(val === undefined || val === null || val === "") { valid = false; break; }
+                if(val === undefined || val === null || val === "" || val === "-") { valid = false; break; }
                 let num = parseFloat(val);
                 if(isNaN(num)) { valid = false; break; }
                 keys.push(num.toFixed(4));
@@ -618,7 +640,7 @@
             return;
         }
         currentSelectedCols = selected;
-        let chartData = buildCompleteFrequency(selected);
+        let chartData = buildFullFrequency(selected);
         if(!chartData || chartData.labels.length === 0) {
             document.getElementById("chartMeta").innerHTML = "❌ No valid numeric data for selected columns";
             return;
@@ -653,7 +675,7 @@
             options: { 
                 responsive: true, 
                 maintainAspectRatio: true,
-                aspectRatio: 1.8,
+                aspectRatio: 1.6,
                 plugins: { 
                     legend: { 
                         labels: { color: '#e2e8f0', font: { size: 10 } }, 
@@ -664,40 +686,18 @@
                             label: (ctx) => `${ctx.label}: ${ctx.raw} occurrences (${((ctx.raw / chartData.total) * 100).toFixed(1)}%)` 
                         } 
                     } 
-                },
-                layout: {
-                    padding: {
-                        left: 10,
-                        right: 25,
-                        top: 10,
-                        bottom: 20
-                    }
-                }
+                } 
             } 
         };
         
         if(type === 'bar') {
             config.options.scales = { 
-                y: { 
-                    beginAtZero: true, 
-                    grid: { color: '#2d3a5e' }, 
-                    title: { display: true, text: 'Frequency', color: '#94a3b8' } 
-                },
-                x: {
-                    ticks: { 
-                        autoSkip: true,
-                        maxRotation: 45,
-                        minRotation: 25,
-                        color: '#cbd5e6'
-                    }
-                }
+                y: { beginAtZero: true, grid: { color: '#2d3a5e' }, title: { display: true, text: 'Frequency', color: '#94a3b8' } },
+                x: { ticks: { autoSkip: true, maxRotation: 45, minRotation: 25, color: '#cbd5e6' } }
             };
         }
         if(type === 'line') {
-            config.options.scales = { 
-                y: { beginAtZero: true, grid: { color: '#2d3a5e' } }, 
-                x: { ticks: { autoSkip: true, maxRotation: 45, color: '#cbd5e6' } } 
-            };
+            config.options.scales = { y: { beginAtZero: true, grid: { color: '#2d3a5e' } }, x: { ticks: { autoSkip: true, maxRotation: 45 } } };
         }
         if(type === 'pie' || type === 'doughnut') {
             config.options.plugins.legend.position = 'right';
@@ -705,19 +705,19 @@
         }
         
         activeChart = new Chart(ctx, config);
-        document.getElementById("chartMeta").innerHTML = `✅ ALL ${chartData.groups} unique groups shown | Total records: ${chartData.total} | Columns: ${selected.join(", ")} | No data hidden`;
+        document.getElementById("chartMeta").innerHTML = `✅ ALL ${chartData.groups} unique groups shown | Total: ${chartData.total} records | No data hidden`;
     }
 
     function renderFullTable() {
         let container = document.getElementById("previewArea");
         if(!appData.rows || !appData.rows.length) { 
-            container.innerHTML = '<div style="padding:60px;text-align:center;">📁 Upload Excel file to see complete data preview with all columns</div>'; 
+            container.innerHTML = '<div style="padding:60px;text-align:center;">📁 Upload Excel file to see complete data preview with all original values</div>'; 
             return; 
         }
         
         let html = '<div style="overflow-x: auto;">';
         html += '<table style="min-width: 100%;">';
-        html += '<thead></tr>';
+        html += '<thead><tr>';
         for(let h of appData.headers) {
             html += `<th style="white-space: nowrap; background: #1a2740;">${escapeHtml(String(h))}</th>`;
         }
@@ -729,7 +729,7 @@
                 let val = appData.rows[i][h];
                 let display = (val === undefined || val === null || val === "") ? "—" : String(val);
                 if(display.length > 80) display = display.substring(0, 77) + "...";
-                html += `<td style="max-width: 280px; word-break: break-word; white-space: normal;">${escapeHtml(display)}</td>`;
+                html += `<td style="max-width: 280px; word-break: break-word; white-space: normal;">${escapeHtml(display)}<\/td>`;
             }
             html += '</tr>';
         }
@@ -754,7 +754,11 @@
             select.appendChild(opt);
         });
         document.getElementById("detectMsg").innerHTML = `<i class="fas fa-check-circle"></i> ✅ ${appData.numericCols.length} numeric columns auto-detected. Chart shows EVERY unique group.`;
-        for(let i=0; i<Math.min(2, appData.numericCols.length); i++) if(select.options[i]) select.options[i].selected = true;
+        if(appData.numericCols.length > 0) {
+            for(let i=0; i<Math.min(2, appData.numericCols.length); i++) {
+                if(select.options[i]) select.options[i].selected = true;
+            }
+        }
         renderChart();
         renderFullTable();
     }
@@ -797,62 +801,60 @@
                 let obj = {};
                 for(let j = 0; j < headers.length; j++) {
                     let val = (j < row.length) ? row[j] : "";
-                    obj[headers[j]] = (val === undefined || val === null) ? "" : val;
+                    if(val !== undefined && val !== null && val !== "") {
+                        obj[headers[j]] = val;
+                    } else {
+                        obj[headers[j]] = "";
+                    }
                 }
                 dataRows.push(obj);
             }
             
             if(dataRows.length === 0) throw new Error("No data rows found");
             
-            let cleanedHeaders = headers.map(h => String(h).replace(/[^\w\s\u0600-\u06FF\u00C0-\u024F]/g, '').trim() || `col_${Math.random()}`);
-            
             appData = { 
                 rows: dataRows, 
-                headers: cleanedHeaders, 
-                numericCols: detectNumericColumns(dataRows, cleanedHeaders)
+                headers: headers, 
+                numericCols: detectNumericColumns(dataRows, headers)
             };
             
             updateNumericSelector();
-            document.getElementById("fileStatus").innerHTML = `✅ ${dataRows.length} rows | ${appData.numericCols.length} numeric columns | ${cleanedHeaders.length} total columns`;
+            document.getElementById("fileStatus").innerHTML = `✅ ${dataRows.length} rows loaded | ${appData.numericCols.length} numeric columns | ${headers.length} total columns`;
         } catch(e) { 
+            console.error("Parse error:", e);
             alert("Error parsing file: " + e.message); 
-            document.getElementById("fileStatus").innerHTML = "❌ Failed to load"; 
+            document.getElementById("fileStatus").innerHTML = "❌ Failed to load. Please check file format."; 
         }
     }
 
     function loadSample() {
         appData = {
             rows: [
-                { "Country": "United States", "Year": 2023, "Rank": 1, "GDP_Trillion": 25.44, "Population_M": 335, "Growth_Pct": 2.1, "Inflation": 3.4 },
-                { "Country": "China", "Year": 2023, "Rank": 2, "GDP_Trillion": 17.96, "Population_M": 1412, "Growth_Pct": 5.2, "Inflation": 0.7 },
-                { "Country": "Japan", "Year": 2023, "Rank": 3, "GDP_Trillion": 4.23, "Population_M": 125, "Growth_Pct": 1.0, "Inflation": 2.8 },
-                { "Country": "Germany", "Year": 2023, "Rank": 4, "GDP_Trillion": 4.08, "Population_M": 83, "Growth_Pct": 1.8, "Inflation": 3.1 },
-                { "Country": "India", "Year": 2023, "Rank": 5, "GDP_Trillion": 3.73, "Population_M": 1428, "Growth_Pct": 6.3, "Inflation": 5.5 },
-                { "Country": "United Kingdom", "Year": 2023, "Rank": 6, "GDP_Trillion": 3.09, "Population_M": 67, "Growth_Pct": 0.5, "Inflation": 4.2 },
-                { "Country": "France", "Year": 2023, "Rank": 7, "GDP_Trillion": 2.78, "Population_M": 68, "Growth_Pct": 0.7, "Inflation": 3.0 },
-                { "Country": "Italy", "Year": 2023, "Rank": 8, "GDP_Trillion": 2.01, "Population_M": 59, "Growth_Pct": 0.9, "Inflation": 2.5 },
-                { "Country": "Canada", "Year": 2023, "Rank": 9, "GDP_Trillion": 1.98, "Population_M": 38, "Growth_Pct": 1.4, "Inflation": 3.9 },
-                { "Country": "Brazil", "Year": 2023, "Rank": 10, "GDP_Trillion": 1.92, "Population_M": 214, "Growth_Pct": 2.9, "Inflation": 4.6 },
-                { "Country": "Australia", "Year": 2023, "Rank": 11, "GDP_Trillion": 1.69, "Population_M": 26, "Growth_Pct": 2.0, "Inflation": 4.1 },
-                { "Country": "South Korea", "Year": 2023, "Rank": 12, "GDP_Trillion": 1.67, "Population_M": 52, "Growth_Pct": 1.4, "Inflation": 2.7 },
-                { "Country": "Mexico", "Year": 2023, "Rank": 13, "GDP_Trillion": 1.41, "Population_M": 129, "Growth_Pct": 3.2, "Inflation": 5.0 },
-                { "Country": "Spain", "Year": 2023, "Rank": 14, "GDP_Trillion": 1.39, "Population_M": 48, "Growth_Pct": 1.1, "Inflation": 3.2 },
-                { "Country": "Indonesia", "Year": 2023, "Rank": 15, "GDP_Trillion": 1.32, "Population_M": 277, "Growth_Pct": 5.0, "Inflation": 3.8 }
+                { "Country": "United States", "Year": 2023, "GDP": 25.44, "Population": 335, "Growth": 2.1, "Inflation": 3.4 },
+                { "Country": "China", "Year": 2023, "GDP": 17.96, "Population": 1412, "Growth": 5.2, "Inflation": 0.7 },
+                { "Country": "Japan", "Year": 2023, "GDP": 4.23, "Population": 125, "Growth": 1.0, "Inflation": 2.8 },
+                { "Country": "Germany", "Year": 2023, "GDP": 4.08, "Population": 83, "Growth": 1.8, "Inflation": 3.1 },
+                { "Country": "India", "Year": 2023, "GDP": 3.73, "Population": 1428, "Growth": 6.3, "Inflation": 5.5 },
+                { "Country": "United Kingdom", "Year": 2023, "GDP": 3.09, "Population": 67, "Growth": 0.5, "Inflation": 4.2 },
+                { "Country": "France", "Year": 2023, "GDP": 2.78, "Population": 68, "Growth": 0.7, "Inflation": 3.0 },
+                { "Country": "Italy", "Year": 2023, "GDP": 2.01, "Population": 59, "Growth": 0.9, "Inflation": 2.5 },
+                { "Country": "Canada", "Year": 2023, "GDP": 1.98, "Population": 38, "Growth": 1.4, "Inflation": 3.9 },
+                { "Country": "Brazil", "Year": 2023, "GDP": 1.92, "Population": 214, "Growth": 2.9, "Inflation": 4.6 }
             ],
-            headers: ["Country", "Year", "Rank", "GDP_Trillion", "Population_M", "Growth_Pct", "Inflation"],
-            numericCols: ["Year", "Rank", "GDP_Trillion", "Population_M", "Growth_Pct", "Inflation"]
+            headers: ["Country", "Year", "GDP", "Population", "Growth", "Inflation"],
+            numericCols: ["Year", "GDP", "Population", "Growth", "Inflation"]
         };
         updateNumericSelector();
-        document.getElementById("fileStatus").innerHTML = "📊 Sample Dataset Loaded (15 countries, 6 numeric metrics) - ALL data shown in charts";
+        document.getElementById("fileStatus").innerHTML = "📊 Sample Dataset Loaded (10 countries, 5 numeric metrics)";
     }
 
     function resetAll() {
         appData = { rows: [], headers: [], numericCols: [] };
         if(activeChart) { activeChart.destroy(); activeChart = null; }
         document.getElementById("numericSelect").innerHTML = '<option disabled>No data</option>';
-        document.getElementById("previewArea").innerHTML = '<div style="padding:60px;text-align:center;">Upload Excel to see complete data preview</div>';
+        document.getElementById("previewArea").innerHTML = '<div style="padding:60px;text-align:center;">📁 Upload Excel file to see complete data preview</div>';
         document.getElementById("chartMeta").innerHTML = "No active chart";
-        document.getElementById("fileStatus").innerHTML = "📁 No file";
+        document.getElementById("fileStatus").innerHTML = "📁 No file selected";
         document.getElementById("detectMsg").innerHTML = '<i class="fas fa-robot"></i> Auto-detecting numeric columns...';
         let ctx = document.getElementById("mainChart").getContext("2d");
         ctx.clearRect(0, 0, 800, 400);
@@ -898,7 +900,15 @@
     }
 
     document.getElementById("uploadZone").addEventListener("click", () => document.getElementById("excelFile").click());
-    document.getElementById("excelFile").addEventListener("change", (e) => { if(e.target.files[0]) { let reader = new FileReader(); reader.onload = (ev) => loadExcelData(ev.target.result); reader.readAsArrayBuffer(e.target.files[0]); } });
+    document.getElementById("excelFile").addEventListener("change", (e) => { 
+        if(e.target.files && e.target.files[0]) { 
+            let file = e.target.files[0];
+            let reader = new FileReader(); 
+            reader.onload = (ev) => loadExcelData(ev.target.result); 
+            reader.readAsArrayBuffer(file); 
+            document.getElementById("fileStatus").innerHTML = `⏳ Loading ${file.name}...`;
+        } 
+    });
     document.getElementById("generateChartBtn").addEventListener("click", () => renderChart());
     document.getElementById("sampleDataBtn").addEventListener("click", () => loadSample());
     document.getElementById("resetAllBtn").addEventListener("click", () => resetAll());
@@ -911,7 +921,7 @@
     const uploadZone = document.getElementById("uploadZone");
     uploadZone.addEventListener("dragover", (e) => { e.preventDefault(); uploadZone.style.borderColor = "#3b82f6"; uploadZone.style.background = "rgba(37,99,235,0.15)"; });
     uploadZone.addEventListener("dragleave", () => { uploadZone.style.borderColor = "rgba(59,130,246,0.5)"; uploadZone.style.background = "rgba(0,0,0,0.3)"; });
-    uploadZone.addEventListener("drop", (e) => { e.preventDefault(); uploadZone.style.borderColor = "rgba(59,130,246,0.5)"; let file = e.dataTransfer.files[0]; if(file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) { document.getElementById("excelFile").files = e.dataTransfer.files; let event = new Event('change'); document.getElementById("excelFile").dispatchEvent(event); } else { alert("Please drop an Excel file (.xlsx or .xls)"); } });
+    uploadZone.addEventListener("drop", (e) => { e.preventDefault(); uploadZone.style.borderColor = "rgba(59,130,246,0.5)"; let file = e.dataTransfer.files[0]; if(file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv'))) { document.getElementById("excelFile").files = e.dataTransfer.files; let event = new Event('change'); document.getElementById("excelFile").dispatchEvent(event); } else { alert("Please drop an Excel file (.xlsx, .xls, or .csv)"); } });
     
     resetAll();
 </script>
